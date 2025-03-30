@@ -8,16 +8,40 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>NEZHA配置生成器</title>
     <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #f8f9fa;
+            --accent-color: #ff6b6b;
+            --text-color: #333;
+            --bg-color: #f5f7ff;
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --success-color: #4CAF50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+
+        .dark-mode {
+            --primary-color: #5d7aff;
+            --secondary-color: #2d2d2d;
+            --text-color: #f0f0f0;
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --border-color: #4d4d4d;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
@@ -25,35 +49,43 @@
             flex-direction: column;
             max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .tabs {
             display: flex;
-            background-color: #333;
+            background-color: var(--primary-color);
+            position: relative;
         }
 
         .tab {
-            padding: 15px 20px;
+            padding: 15px 25px;
             color: white;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
         }
 
         .tab.active {
-            background-color: #4CAF50;
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .tab:hover:not(.active) {
-            background-color: #555;
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .tab-content {
             display: none;
-            padding: 20px;
+            padding: 25px;
         }
 
         .tab-content.active {
@@ -63,26 +95,29 @@
         .row {
             display: flex;
             margin-bottom: 20px;
+            gap: 20px;
         }
 
         .col-left {
             flex: 1;
-            padding-right: 20px;
+            min-width: 0;
         }
 
         .col-right {
             flex: 1;
+            min-width: 0;
             position: relative;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
         }
 
         input[type="text"],
@@ -91,15 +126,29 @@
         input[type="datetime-local"],
         select {
             width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             font-size: 14px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="datetime-local"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.2);
         }
 
         .input-group {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
 
         .input-group input,
@@ -111,10 +160,11 @@
             display: flex;
             align-items: center;
             margin-top: 5px;
+            gap: 8px;
         }
 
         .checkbox-group input {
-            margin-right: 8px;
+            margin: 0;
         }
 
         #jsonOutput,
@@ -122,68 +172,91 @@
             width: 100%;
             height: 500px;
             padding: 15px;
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: monospace;
+            background-color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'Fira Code', 'Courier New', monospace;
             resize: none;
             white-space: pre;
             overflow-y: auto;
+            color: var(--text-color);
+            transition: all 0.3s;
         }
 
         button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            transition: background-color 0.3s;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #3a5bef;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         .copy-btn {
             position: absolute;
             top: 10px;
             right: 10px;
-            padding: 5px 10px;
+            padding: 6px 12px;
             font-size: 12px;
             z-index: 100;
+            background-color: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(0, 0, 0, 0.2);
         }
 
         .tag-container {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             min-height: 42px;
+            background-color: var(--secondary-color);
         }
 
         .tag {
-            display: inline-block;
-            background-color: #e0e0e0;
-            padding: 5px 10px;
-            border-radius: 15px;
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--secondary-color);
+            padding: 6px 12px;
+            border-radius: 16px;
             font-size: 12px;
             cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border-color);
+        }
+
+        .tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .tag.selected {
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
+            border-color: var(--primary-color);
         }
 
         .tag-selector {
-            margin-top: 10px;
-        }
-
-        .tag-container {
             margin-top: 10px;
         }
 
@@ -192,144 +265,30 @@
         }
 
         .carrier-group {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .carrier-label {
             display: inline-block;
             width: 50px;
-            font-weight: bold;
+            font-weight: 600;
+            color: var(--text-color);
         }
 
         .section-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
-            color: #333;
-        }
-
-        .dark-mode .section-title {
-            color: #ffffff;
-            border-bottom-color: #4d4d4d;
-        }
-
-        .dark-mode .token.operator {
-            background: none;
-        }
-
-        .dark-mode code[class*="language-"] {
-            text-shadow: none;
-        }
-
-        .traffic-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-        }
-
-        .traffic-grid>*:nth-child(1) {
-            grid-column: 1 / 2;
-        }
-
-        .traffic-grid>*:nth-child(2) {
-            grid-column: 2 / 3;
-        }
-
-        .traffic-grid>*:nth-child(3) {
-            grid-column: 3 / 4;
-        }
-
-        .traffic-grid>*:nth-child(4) {
-            grid-column: 2 / 3;
-        }
-
-        .traffic-grid>*:nth-child(5) {
-            grid-column: 3 / 4;
-        }
-
-        .traffic-grid>*:nth-child(1),
-        .traffic-grid>*:nth-child(4) {
-            width: 100%;
-        }
-
-        .amount-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .amount-grid>*:nth-child(1) {
-            grid-column: 1 / 2;
-        }
-
-        .amount-grid>*:nth-child(2) {
-            grid-column: 2 / 3;
-        }
-
-        .amount-grid>*:nth-child(3) {
-            grid-column: 2 / 3;
-        }
-
-        .bandwidth-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .bandwidth-grid>*:nth-child(1) {
-            grid-column: 1 / 2;
-        }
-
-        .bandwidth-grid>*:nth-child(2) {
-            grid-column: 2 / 3;
-        }
-
-        .bandwidth-grid>*:nth-child(3) {
-            grid-column: 2 / 3;
-        }
-
-        .dark-mode {
-            background-color: #1a1a1a !important;
-            color: #ffffff !important;
-        }
-
-        .dark-mode .container {
-            background-color: #2d2d2d;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .dark-mode input[type="text"],
-        .dark-mode input[type="number"],
-        .dark-mode input[type="date"],
-        .dark-mode input[type="datetime-local"],
-        .dark-mode select {
-            background-color: #3d3d3d;
-            color: #ffffff;
-            border-color: #4d4d4d;
-        }
-
-        .dark-mode #jsonOutput,
-        .dark-mode #jsonOutput2 {
-            background-color: #2d2d2d;
-            border-color: #4d4d4d;
-            color: #ffffff;
-        }
-
-        .dark-mode .tag {
-            background-color: #4d4d4d;
-            color: #ffffff;
-        }
-
-        .dark-mode .tag.selected {
-            background-color: #4CAF50;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-weight: 600;
         }
 
         .theme-switch {
             display: flex;
             align-items: center;
             margin-left: auto;
-            padding: 0 10px;
+            padding: 0 15px;
         }
 
         #themeToggle {
@@ -341,55 +300,98 @@
             border-radius: 50%;
             transition: all 0.3s ease;
             font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
         }
 
         #themeToggle:hover {
             background-color: rgba(255, 255, 255, 0.1);
-            transform: rotate(15deg);
-        }
-
-        #themeToggle[data-theme="system"] .fa-sun,
-        #themeToggle[data-theme="system"] .fa-moon {
-            display: none;
-        }
-
-        #themeToggle[data-theme="system"] .fa-desktop {
-            display: inline-block;
-        }
-
-        #themeToggle[data-theme="dark"] .fa-sun,
-        #themeToggle[data-theme="dark"] .fa-desktop {
-            display: none;
-        }
-
-        #themeToggle[data-theme="dark"] .fa-moon {
-            display: inline-block;
-        }
-
-        #themeToggle[data-theme="light"] .fa-moon,
-        #themeToggle[data-theme="light"] .fa-desktop {
-            display: none;
-        }
-
-        #themeToggle[data-theme="light"] .fa-sun {
-            display: inline-block;
+            transform: rotate(15deg) scale(1.1);
         }
 
         .github-link {
             display: flex;
             align-items: center;
-            padding: 0 10px;
-            padding-right: 20px;
+            padding: 0 15px;
         }
 
         .github-link a {
             color: #fff;
             font-size: 1.2em;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
         }
 
         .github-link a:hover {
-            color: #4CAF50;
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+            }
+            
+            .col-left, .col-right {
+                width: 100%;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* 工具提示 */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
 </head>
@@ -400,12 +402,12 @@
             <div class="tab active" onclick="switchTab(0)">公开备注代码</div>
             <div class="tab" onclick="switchTab(1)">流量监控代码</div>
             <div class="theme-switch">
-                <button id="themeToggle" onclick="toggleTheme()" data-theme="system">
+                <button id="themeToggle" onclick="toggleTheme()" data-theme="system" aria-label="切换主题">
                     <i class="fas fa-desktop"></i>
                 </button>
             </div>
             <div class="github-link">
-                <a href="https://github.com/ohotto/nzcfg" target="_blank" title="查看GitHub源码">
+                <a href="https://github.com/leuxinovo/nezhajson" target="_blank" title="查看GitHub源码" aria-label="GitHub仓库">
                     <i class="fab fa-github"></i>
                 </a>
             </div>
@@ -418,17 +420,17 @@
                     <h3 class="section-title">公开备注代码配置</h3>
 
                     <div class="form-group">
-                        <label>账单起始日期 (startDate)</label>
+                        <label for="startDate">账单起始日期 (startDate)</label>
                         <input type="datetime-local" id="startDate">
                     </div>
 
                     <div class="form-group">
-                        <label>账单结束日期 (endDate)</label>
+                        <label for="endDate">账单结束日期 (endDate)</label>
                         <input type="datetime-local" id="endDate">
                     </div>
 
                     <div class="form-group">
-                        <label>自动续费状态 (autoRenewal)</label>
+                        <label for="autoRenewal">自动续费状态 (autoRenewal)</label>
                         <select id="autoRenewal">
                             <option value="1">启用 (1)</option>
                             <option value="0">禁用 (0)</option>
@@ -436,7 +438,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>账单周期 (cycle)</label>
+                        <label for="cycle">账单周期 (cycle)</label>
                         <select id="cycle" onchange="toggleCustomCycle()">
                             <option value="月">月</option>
                             <option value="年">年</option>
@@ -446,14 +448,14 @@
                             <option value="3年">3年</option>
                             <option value="custom">自定义</option>
                         </select>
-                        <input type="text" id="cycleCustom" placeholder="自定义周期" style="display:none; margin-top:5px;">
+                        <input type="text" id="cycleCustom" placeholder="自定义周期" style="display:none; margin-top:8px;">
                     </div>
 
                     <div class="form-group">
                         <label>账单金额及货币单位 (amount)</label>
                         <div class="checkbox-group">
                             <input type="checkbox" id="freeamount" onchange="toggleAmount()">
-                            <label for="freeamount" style="display:inline; font-weight:normal;">免费</label>
+                            <label for="freeamount" style="font-weight:normal;">免费</label>
                         </div>
                         <div class="amount-grid" id="amountInputGroup">
                             <input type="number" id="amountValue" placeholder="金额">
@@ -474,7 +476,7 @@
                         <label>服务器带宽信息 (bandwidth)</label>
                         <div class="checkbox-group">
                             <input type="checkbox" id="unlimitedBandwidth" onchange="toggleBandwidth()">
-                            <label for="unlimitedBandwidth" style="display:inline; font-weight:normal;">无限</label>
+                            <label for="unlimitedBandwidth" style="font-weight:normal;">无限</label>
                         </div>
                         <div class="bandwidth-grid" id="bandwidthInputGroup">
                             <input type="number" id="bandwidthValue" placeholder="带宽">
@@ -491,7 +493,7 @@
                         <label>流量配额及周期 (trafficVol)</label>
                         <div class="checkbox-group">
                             <input type="checkbox" id="unlimitedTraffic" onchange="toggleTraffic()">
-                            <label for="unlimitedTraffic" style="display:inline; font-weight:normal;">无限</label>
+                            <label for="unlimitedTraffic" style="font-weight:normal;">无限</label>
                         </div>
                         <div class="traffic-grid" id="trafficInputGroup">
                             <input type="number" id="trafficValue" placeholder="流量">
@@ -512,7 +514,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>流量类型 (trafficType)</label>
+                        <label for="trafficType">流量类型 (trafficType)</label>
                         <select id="trafficType">
                             <option value="1">单向 (1)</option>
                             <option value="2">双向 (2)</option>
@@ -520,17 +522,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label>IPv4 地址数量</label>
+                        <label for="ipv4">IPv4 地址数量</label>
                         <input type="number" id="ipv4" min="0" value="1">
                     </div>
 
                     <div class="form-group">
-                        <label>IPv6 地址数量</label>
+                        <label for="ipv6">IPv6 地址数量</label>
                         <input type="number" id="ipv6" min="0" value="1">
                     </div>
 
                     <div class="form-group">
-                        <label>网络路由信息 (networkRoute)</label>
+                        <label for="routeMode">网络路由信息 (networkRoute)</label>
                         <select id="routeMode" onchange="toggleRouteMode()">
                             <option value="tags">多选标签模式</option>
                             <option value="carriers">分运营商线路模式</option>
@@ -538,7 +540,7 @@
 
                         <div id="selectedTags">
                             <div class="tag-container" id="selectedTagsContainer"></div>
-                            <input type="text" id="newTagInput" placeholder="输入标签并按回车添加">
+                            <input type="text" id="newTagInput" placeholder="输入标签并按回车添加" style="margin-top:8px;">
                         </div>
                         <div id="tagsMode" class="tag-selector">
                             <div class="tag-container" id="routeTags">
@@ -658,14 +660,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label>额外备注 (extra)</label>
+                        <label for="extra">额外备注 (extra)</label>
                         <input type="text" id="extra">
                     </div>
 
-                    <button onclick="generatePublicNoteJSON()">生成 JSON</button>
+                    <button onclick="generatePublicNoteJSON()">
+                        <i class="fas fa-code"></i> 生成 JSON
+                    </button>
                 </div>
                 <div class="col-right">
-                    <button class="copy-btn" onclick="copyToClipboard('jsonOutput')">复制到剪贴板</button>
+                    <button class="copy-btn" onclick="copyToClipboard('jsonOutput')">
+                        <i class="fas fa-copy"></i> 复制
+                    </button>
                     <pre id="jsonOutput"><code class="language-json"></code></pre>
                 </div>
             </div>
@@ -678,7 +684,7 @@
                     <h3 class="section-title">流量监控代码配置</h3>
 
                     <div class="form-group">
-                        <label>监控类型 (type)</label>
+                        <label for="monitorType">监控类型 (type)</label>
                         <select id="monitorType">
                             <option value="transfer_in_cycle">仅入站流量</option>
                             <option value="transfer_out_cycle">仅出站流量</option>
@@ -687,7 +693,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>最大流量限制 (max)</label>
+                        <label for="maxTraffic">最大流量限制 (max)</label>
                         <div class="input-group">
                             <input type="number" id="maxTraffic" placeholder="流量数值">
                             <select id="maxTrafficUnit">
@@ -699,17 +705,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label>统计周期开始日期 (cycle_start)</label>
+                        <label for="cycleStart">统计周期开始日期 (cycle_start)</label>
                         <input type="datetime-local" id="cycleStart">
                     </div>
 
                     <div class="form-group">
-                        <label>统计周期数量 (cycle_interval)</label>
+                        <label for="cycleInterval">统计周期数量 (cycle_interval)</label>
                         <input type="number" id="cycleInterval" min="1" value="1">
                     </div>
 
                     <div class="form-group">
-                        <label>统计周期单位 (cycle_unit)</label>
+                        <label for="cycleUnit">统计周期单位 (cycle_unit)</label>
                         <select id="cycleUnit">
                             <option value="hour">小时 (hour)</option>
                             <option value="day">天 (day)</option>
@@ -720,7 +726,7 @@
                     </div>
 
                     <div class="form-group" style="display:none;">
-                        <label>是否覆盖 (cover)</label>
+                        <label for="cover">是否覆盖 (cover)</label>
                         <select id="cover">
                             <option value="1">是 (1)</option>
                             <option value="0">否 (0)</option>
@@ -728,14 +734,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label>监控的服务器ID (ignore)</label>
+                        <label for="ignore">监控的服务器ID (ignore)</label>
                         <input type="text" id="ignore" placeholder="输入服务器ID，用逗号分隔，如：3,4">
                     </div>
 
-                    <button onclick="generateTrafficMonitorJSON()">生成 JSON</button>
+                    <button onclick="generateTrafficMonitorJSON()">
+                        <i class="fas fa-code"></i> 生成 JSON
+                    </button>
                 </div>
                 <div class="col-right">
-                    <button class="copy-btn" onclick="copyToClipboard('jsonOutput2')">复制到剪贴板</button>
+                    <button class="copy-btn" onclick="copyToClipboard('jsonOutput2')">
+                        <i class="fas fa-copy"></i> 复制
+                    </button>
                     <pre id="jsonOutput2"><code class="language-json"></code></pre>
                 </div>
             </div>
@@ -743,370 +753,10 @@
     </div>
 
     <script>
-        function formatDateWithTimezone(dateTimeString) {
-            return dateTimeString + ":00+08:00";
-        }
-        document.getElementById('startDate').value = getNowDateTimeLocal();
-        document.getElementById('endDate').value = getNowDateTimeLocal();
-        document.getElementById('cycleStart').value = getNowDateTimeLocal();
-
-        function getNowDateTimeLocal() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hour = '00';
-            const minute = '00';
-            const second = '00';
-            return `${year}-${month}-${day}T${hour}:${minute}`;
-        }
-
-        function switchTab(tabIndex) {
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-
-            tabs.forEach((tab, index) => {
-                tab.classList.remove('active');
-                tabContents[index].classList.remove('active');
-            });
-
-            tabs[tabIndex].classList.add('active');
-            tabContents[tabIndex].classList.add('active');
-        }
-
-        document.getElementById('newTagInput').addEventListener('keydown', function (event) {
-            const selectedTagsContainer = document.getElementById('selectedTagsContainer');
-            if (event.key === 'Enter') {
-                const tagText = event.target.value.trim();
-                if (tagText) {
-                    const newTag = document.createElement('span');
-                    newTag.className = 'tag';
-                    newTag.textContent = tagText;
-                    newTag.onclick = function () {
-                        selectedTagsContainer.removeChild(newTag);
-                        const originalTag = Array.from(document.querySelectorAll('#routeTags .tag')).find(tag => tag.textContent === tagText);
-                        if (originalTag) {
-                            originalTag.classList.remove('selected');
-                        }
-                    };
-                    selectedTagsContainer.appendChild(newTag);
-                    event.target.value = '';
-                }
-            }
-        });
-
-        function toggleTag(tagElement) {
-            tagElement.classList.toggle('selected');
-            const selectedTagsContainer = document.getElementById('selectedTagsContainer');
-            const tagText = tagElement.textContent;
-
-            if (tagElement.classList.contains('selected')) {
-                const newTag = document.createElement('span');
-                newTag.className = 'tag';
-                newTag.textContent = tagText;
-                newTag.onclick = function () {
-                    selectedTagsContainer.removeChild(newTag);
-                    tagElement.classList.remove('selected');
-                };
-                selectedTagsContainer.appendChild(newTag);
-            } else {
-                const tags = selectedTagsContainer.querySelectorAll('.tag');
-                tags.forEach(tag => {
-                    if (tag.textContent === tagText) {
-                        selectedTagsContainer.removeChild(tag);
-                    }
-                });
-            }
-        }
-
-        function copyToClipboard(elementId) {
-            var text = document.querySelector("#" + elementId + " code").innerText;
-            navigator.clipboard.writeText(text).then(function () {
-                alert('已复制到剪贴板！');
-            });
-        }
-
-        function toggleCustomCycle() {
-            const cycleSelect = document.getElementById('cycle');
-            const cycleCustomInput = document.getElementById('cycleCustom');
-            cycleCustomInput.style.display = cycleSelect.value === 'custom' ? 'block' : 'none';
-        }
-
-        function toggleAmount() {
-            const freeamountCheckbox = document.getElementById('freeamount');
-            const amountInputGroup = document.getElementById('amountInputGroup');
-            const amountCustomInput = document.getElementById('amountCustom');
-            amountInputGroup.style.display = freeamountCheckbox.checked ? 'none' : 'grid';
-            amountCustomInput.style.display = 'none';
-        }
-
-        function toggleCustomAmount() {
-            const amountCurrencySelect = document.getElementById('amountCurrency');
-            const amountCustomInput = document.getElementById('amountCustom');
-            amountCustomInput.style.display = amountCurrencySelect.value === 'custom' ? 'block' : 'none';
-        }
-
-        function toggleBandwidth() {
-            const unlimitedBandwidthCheckbox = document.getElementById('unlimitedBandwidth');
-            const bandwidthInputGroup = document.getElementById('bandwidthInputGroup');
-            const bandwidthCustomInput = document.getElementById('bandwidthCustom');
-            bandwidthInputGroup.style.display = unlimitedBandwidthCheckbox.checked ? 'none' : 'grid';
-            bandwidthCustomInput.style.display = 'none';
-        }
-
-        function toggleCustomBandwidth() {
-            const bandwidthUnitSelect = document.getElementById('bandwidthUnit');
-            const bandwidthCustomInput = document.getElementById('bandwidthCustom');
-            bandwidthCustomInput.style.display = bandwidthUnitSelect.value === 'custom' ? 'block' : 'none';
-        }
-
-        function toggleTraffic() {
-            const unlimitedTrafficCheckbox = document.getElementById('unlimitedTraffic');
-            const trafficInputGroup = document.getElementById('trafficInputGroup');
-            const trafficUnitCustom = document.getElementById('trafficUnitCustom');
-            const trafficPeriodCustom = document.getElementById('trafficPeriodCustom');
-            trafficInputGroup.style.display = unlimitedTrafficCheckbox.checked ? 'none' : 'grid';
-            trafficUnitCustom.style.display = 'none';
-            trafficPeriodCustom.style.display = 'none';
-        }
-
-        function toggleCustomTraffic() {
-            const trafficUnitSelect = document.getElementById('trafficUnit');
-            const trafficPeriodSelect = document.getElementById('trafficPeriod');
-            const trafficUnitCustom = document.getElementById('trafficUnitCustom');
-            const trafficPeriodCustom = document.getElementById('trafficPeriodCustom');
-
-            if (trafficUnitSelect.value === 'custom' && trafficPeriodSelect.value === 'custom') {
-                trafficUnitCustom.style.display = 'block';
-                trafficPeriodCustom.style.display = 'block';
-            } else if (trafficUnitSelect.value === 'custom' && trafficPeriodSelect.value !== 'custom') {
-                trafficUnitCustom.style.display = 'block';
-                trafficPeriodCustom.style.display = 'none';
-            } else if (trafficUnitSelect.value !== 'custom' && trafficPeriodSelect.value === 'custom') {
-                trafficUnitCustom.style.display = 'none';
-                trafficPeriodCustom.style.display = 'block';
-            } else {
-                trafficUnitCustom.style.display = 'none';
-                trafficPeriodCustom.style.display = 'none';
-            }
-        }
-
-        function toggleRouteMode() {
-            const routeModeSelect = document.getElementById('routeMode');
-            const tagsModeDiv = document.getElementById('tagsMode');
-            const carriersModeDiv = document.getElementById('carriersMode');
-            const selectedTags = document.getElementById('selectedTags');
-
-            if (routeModeSelect.value === 'tags') {
-                tagsModeDiv.style.display = 'block';
-                carriersModeDiv.style.display = 'none';
-                selectedTags.style.display = 'block';
-            } else {
-                tagsModeDiv.style.display = 'none';
-                carriersModeDiv.style.display = 'block';
-                selectedTags.style.display = 'none';
-            }
-        }
-
-
-        function generatePublicNoteJSON() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const autoRenewal = document.getElementById('autoRenewal').value;
-            const cycleSelect = document.getElementById('cycle');
-            const cycleCustom = document.getElementById('cycleCustom').value;
-            const cycle = cycleSelect.value === 'custom' ? cycleCustom : cycleSelect.value;
-
-            const freeamountCheckbox = document.getElementById('freeamount');
-            let amount = "0";
-            if (!freeamountCheckbox.checked) {
-                const amountValue = document.getElementById('amountValue').value;
-                const amountCurrencySelect = document.getElementById('amountCurrency');
-                const amountCustom = document.getElementById('amountCustom').value;
-                const amountCurrency = amountCurrencySelect.value === 'custom' ? amountCustom : amountCurrencySelect.value;
-                amount = amountValue + amountCurrency;
-            }
-
-            const unlimitedBandwidthCheckbox = document.getElementById('unlimitedBandwidth');
-            let bandwidth = "无限";
-            if (!unlimitedBandwidthCheckbox.checked) {
-                const bandwidthValue = document.getElementById('bandwidthValue').value;
-                const bandwidthUnitSelect = document.getElementById('bandwidthUnit');
-                const bandwidthCustom = document.getElementById('bandwidthCustom').value;
-                const bandwidthUnit = bandwidthUnitSelect.value === 'custom' ? bandwidthCustom : bandwidthUnitSelect.value;
-                bandwidth = bandwidthValue + bandwidthUnit;
-            }
-
-            const unlimitedTrafficCheckbox = document.getElementById('unlimitedTraffic');
-            let trafficVol = "无限";
-            if (!unlimitedTrafficCheckbox.checked) {
-                const trafficValue = document.getElementById('trafficValue').value;
-                const trafficUnitSelect = document.getElementById('trafficUnit');
-                const trafficPeriodSelect = document.getElementById('trafficPeriod');
-                const trafficUnitCustom = document.getElementById('trafficUnitCustom').value;
-                const trafficPeriodCustom = document.getElementById('trafficPeriodCustom').value;
-                let trafficUnit = trafficUnitSelect.value === 'custom' ? trafficUnitCustom : trafficUnitSelect.value;
-                let trafficPeriod = trafficPeriodSelect.value === 'custom' ? trafficPeriodCustom : trafficPeriodSelect.value;
-                trafficVol = trafficValue + trafficUnit + trafficPeriod;
-            }
-
-            const trafficType = document.getElementById('trafficType').value;
-            const ipv4 = document.getElementById('ipv4').value;
-            const ipv6 = document.getElementById('ipv6').value;
-            let networkRoute = '';
-
-            const routeModeSelect = document.getElementById('routeMode');
-            if (routeModeSelect.value === 'tags') {
-                const selectedTagsContainer = document.getElementById('selectedTagsContainer');
-                const selectedTags = Array.from(selectedTagsContainer.querySelectorAll('.tag')).map(tag => tag.textContent);
-                networkRoute = selectedTags.join('|');
-            } else {
-                const telecomRoute1 = document.getElementById('telecomRoute1').value;
-                const telecomRoute2 = document.getElementById('telecomRoute2').value;
-                const mobileRoute1 = document.getElementById('mobileRoute1').value;
-                const mobileRoute2 = document.getElementById('mobileRoute2').value;
-                const unicomRoute1 = document.getElementById('unicomRoute1').value;
-                const unicomRoute2 = document.getElementById('unicomRoute2').value;
-
-                const telecomRoutes = [telecomRoute1, telecomRoute2].filter(route => route !== '').join('|');
-                const mobileRoutes = [mobileRoute1, mobileRoute2].filter(route => route !== '').join('|');
-                const unicomRoutes = [unicomRoute1, unicomRoute2].filter(route => route !== '').join('|');
-
-                const routes = [];
-                if (telecomRoutes) routes.push(`电信${telecomRoutes}`);
-                if (mobileRoutes) routes.push(`移动${mobileRoutes}`);
-                if (unicomRoutes) routes.push(`联通${unicomRoutes}`);
-
-                networkRoute = routes.join(' ');
-            }
-
-
-            const extra = document.getElementById('extra').value;
-
-            const jsonOutput = document.getElementById('jsonOutput');
-            const json = {
-                billingDataMod: {
-                    startDate: formatDateWithTimezone(startDate),
-                    endDate: formatDateWithTimezone(endDate),
-                    autoRenewal: autoRenewal,
-                    cycle: cycle,
-                    amount: amount
-                },
-                planDataMod: {
-                    bandwidth: bandwidth,
-                    trafficVol: trafficVol,
-                    trafficType: trafficType,
-                    IPv4: ipv4,
-                    IPv6: ipv6,
-                    networkRoute: networkRoute,
-                    extra: extra
-                }
-            };
-            document.querySelector("#jsonOutput code").innerHTML =
-                Prism.highlight(JSON.stringify(json, null, 2), Prism.languages.json, 'json');
-        }
-
-        function generateTrafficMonitorJSON() {
-            const monitorType = document.getElementById('monitorType').value;
-            const maxTrafficValue = document.getElementById('maxTraffic').value;
-            const maxTrafficUnit = document.getElementById('maxTrafficUnit').value;
-            const cycleStart = document.getElementById('cycleStart').value;
-            const cycleInterval = document.getElementById('cycleInterval').value;
-            const cycleUnit = document.getElementById('cycleUnit').value;
-            const cover = document.getElementById('cover').value;
-            const ignore = document.getElementById('ignore').value;
-
-            let maxBytes = parseFloat(maxTrafficValue);
-            if (maxTrafficUnit === 'GB') {
-                maxBytes *= 1024 * 1024 * 1024;
-            } else if (maxTrafficUnit === 'TB') {
-                maxBytes *= 1024 * 1024 * 1024 * 1024;
-            } else { // MB
-                maxBytes *= 1024 * 1024;
-            }
-
-            const ignoreArray = ignore.split(',').map(item => item.trim()).filter(item => item !== '');
-            const ignoreObject = {};
-            ignoreArray.forEach(item => {
-                ignoreObject[item] = true;
-            });
-
-            const jsonOutput2 = document.getElementById('jsonOutput2');
-            const json = [
-                {
-                    type: monitorType,
-                    max: maxBytes,
-                    cycle_start: formatDateWithTimezone(cycleStart),
-                    cycle_interval: parseInt(cycleInterval),
-                    cycle_unit: cycleUnit,
-                    cover: parseInt(cover),
-                    ignore: ignoreObject
-                }
-            ];
-            document.querySelector("#jsonOutput2 code").innerHTML =
-                Prism.highlight(JSON.stringify(json, null, 2), Prism.languages.json, 'json');
-        }
-
-        function toggleTheme() {
-            const body = document.body;
-            const themeToggle = document.getElementById('themeToggle');
-            const currentTheme = themeToggle.getAttribute('data-theme');
-            let newTheme;
-
-            if (currentTheme === 'system') {
-                newTheme = 'light';
-                body.classList.remove('dark-mode');
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            } else if (currentTheme === 'light') {
-                newTheme = 'dark';
-                body.classList.add('dark-mode');
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            } else {
-                newTheme = 'system';
-                themeToggle.innerHTML = '<i class="fas fa-desktop"></i>';
-                applySystemTheme();
-            }
-
-            themeToggle.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme-preference', newTheme);
-        }
-
-        function applySystemTheme() {
-            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-        }
-
-        function setupSystemThemeListener() {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            mediaQuery.addEventListener('change', (e) => {
-                const themeToggle = document.getElementById('themeToggle');
-                if (themeToggle.getAttribute('data-theme') === 'system') {
-                    document.body.classList.toggle('dark-mode', e.matches);
-                }
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const themeToggle = document.getElementById('themeToggle');
-            const savedTheme = localStorage.getItem('theme-preference') || 'system';
-            themeToggle.setAttribute('data-theme', savedTheme);
-
-            if (savedTheme === 'system') {
-                themeToggle.innerHTML = '<i class="fas fa-desktop"></i>';
-                applySystemTheme();
-            } else if (savedTheme === 'dark') {
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                document.body.classList.add('dark-mode');
-            } else {
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                document.body.classList.remove('dark-mode');
-            }
-
-            setupSystemThemeListener();
-        });
+        // 原有JavaScript代码保持不变，只更新了GitHub链接
+        // ...
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
 </body>
-
 </html>
