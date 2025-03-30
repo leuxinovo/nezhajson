@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEZHA配置生成器</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* 浅色主题变量 */
+            --color-primary: #4361ee;
+            --color-primary-light: #e6e9ff;
+            --color-secondary: #3a0ca3;
+            --color-accent: #f72585;
+            --color-success: #4cc9f0;
+            --color-warning: #f8961e;
+            --color-danger: #ef233c;
+            
+            --color-text: #2b2d42;
+            --color-text-light: #8d99ae;
+            --color-bg: #f8f9fa;
+            --color-card: #ffffff;
+            --color-border: #e9ecef;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 深色主题变量 */
+        .dark {
+            --color-primary: #4895ef;
+            --color-primary-light: #1a2c4d;
+            --color-secondary: #3f37c9;
+            --color-accent: #f72585;
+            --color-success: #4cc9f0;
+            --color-warning: #f8961e;
+            --color-danger: #ef233c;
+            
+            --color-text: #edf2f4;
+            --color-text-light: #8d99ae;
+            --color-bg: #121212;
+            --color-card: #1e1e1e;
+            --color-border: #2d2d2d;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.25);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.2);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            transition: var(--transition);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 2rem;
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+            }
+        }
+
+        /* 容器样式 */
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: var(--color-card);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        /* 头部样式 */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .app-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .app-title i {
+            font-size: 1.1em;
+        }
+
+        .app-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* 主题切换按钮 */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* GitHub链接 */
+        .github-link {
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .github-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* 标签页样式 */
+        .tabs {
+            display: flex;
+            background-color: var(--color-primary-light);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--color-text-light);
+            position: relative;
+            transition: var(--transition);
+            text-align: center;
+            flex: 1;
+        }
+
+        .tab.active {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--color-primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--color-text);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        /* 标签内容 */
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 表单布局 */
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .form-label small {
+            font-weight: 400;
+            color: var(--color-text-light);
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+        }
+
+        /* 表单控件 */
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background-color: var(--color-card);
+            color: var(--color-text);
+            font-size: 0.9375rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+            padding-right: 2.5rem;
+        }
+
+        /* 输入组 */
+        .input-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .input-group .form-control {
+            flex: 1;
+        }
+
+        /* 复选框和单选按钮 */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-label {
+            font-weight: 400;
+            color: var(--color-text);
+            cursor: pointer;
+        }
+
+        /* 标签系统 */
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background-color: var(--color-card);
+            min-height: 3.5rem;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            background-color: var(--color-bg);
+            border-radius: 1.5rem;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--color-border);
+        }
+
+        .tag:hover {
+            background-color: var(--color-primary-light);
+            border-color: var(--color-primary);
+        }
+
+        .tag.selected {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .tag-input {
+            flex: 1;
+            min-width: 120px;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--color-text);
+        }
+
+        /* 运营商路由 */
+        .carrier-group {
+            margin-bottom: 1rem;
+        }
+
+        .carrier-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .route-direction {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .direction-label {
+            min-width: 3.5rem;
+            font-size: 0.875rem;
+            color: var(--color-text-light);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-secondary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--color-bg);
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+        }
+
+        /* 代码显示区域 */
+        .code-container {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            height: 500px;
+            border: 1px solid var(--color-border);
+        }
+
+        .code-toolbar {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            z-index: 10;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #jsonOutput, #jsonOutput2 {
+            width: 100%;
+            height: 100%;
+            padding: 1.5rem;
+            background-color: var(--color-bg);
+            border: none;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.7;
+            color: var(--color-text);
+            resize: none;
+            white-space: pre;
+            overflow-y: auto;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 767px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                padding: 0.75rem;
+                text-align: left;
+                border-bottom: 1px solid var(--color-border);
+            }
+            
+            .tab.active::after {
+                display: none;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .code-container {
+                height: 400px;
+            }
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 通知提示 */
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--color-primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast i {
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">
+                <i class="fas fa-robot"></i>
+                <span>NEZHA配置生成器</span>
+            </h1>
+            <div class="app-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+                    <i class="fas fa-desktop"></i>
+                </button>
+                <a href="https://github.com/leuxinovo/nezhajson" class="github-link" target="_blank" aria-label="GitHub仓库">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(0)">公开备注代码</div>
+            <div class="tab" onclick="switchTab(1)">流量监控代码</div>
+        </div>
+
+        <!-- 公开备注代码 -->
+        <div class="tab-content active" id="publicNoteTab">
+            <div class="form-grid">
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-cog"></i>
+                        <span>基本配置</span>
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label" for="startDate">账单起始日期 <small>(startDate)</small></label>
+                        <input type="datetime-local" id="startDate" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="endDate">账单结束日期 <small>(endDate)</small></label>
+                        <input type="datetime-local" id="endDate" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="autoRenewal">自动续费状态 <small>(autoRenewal)</small></label>
+                        <select id="autoRenewal" class="form-control">
+                            <option value="1">启用 (1)</option>
+                            <option value="0">禁用 (0)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="cycle">账单周期 <small>(cycle)</small></label>
+                        <select id="cycle" class="form-control" onchange="toggleCustomCycle()">
+                            <option value="月">月</option>
+                            <option value="年">年</option>
+                            <option value="季">季</option>
+                            <option value="半年">半年</option>
+                            <option value="2年">2年</option>
+                            <option value="3年">3年</option>
+                            <option value="custom">自定义</option>
+                        </select>
+                        <input type="text" id="cycleCustom" class="form-control mt-2" placeholder="自定义周期" style="display:none;">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-network-wired"></i>
+                        <span>网络配置</span>
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label">IPv4 地址数量</label>
+                        <input type="number" id="ipv4" class="form-control" min="0" value="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">IPv6 地址数量</label>
+                        <input type="number" id="ipv6" class="form-control" min="0" value="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="routeMode">网络路由信息 <small>(networkRoute)</small></label>
+                        <select id="routeMode" class="form-control" onchange="toggleRouteMode()">
+                            <option value="tags">多选标签模式</option>
+                            <option value="carriers">分运营商线路模式</option>
+                        </select>
+
+                        <div id="selectedTags" class="mt-2">
+                            <div class="tag-container" id="selectedTagsContainer"></div>
+                            <input type="text" id="newTagInput" class="form-control mt-2" placeholder="输入标签并按回车添加">
+                        </div>
+                        <div id="tagsMode" class="tag-selector mt-2">
+                            <div class="tag-container" id="routeTags">
+                                <span class="tag" onclick="toggleTag(this)">163</span>
+                                <span class="tag" onclick="toggleTag(this)">CN2</span>
+                                <span class="tag" onclick="toggleTag(this)">CN2GIA</span>
+                                <span class="tag" onclick="toggleTag(this)">CMI</span>
+                                <span class="tag" onclick="toggleTag(this)">CMIN2</span>
+                                <span class="tag" onclick="toggleTag(this)">4837</span>
+                                <span class="tag" onclick="toggleTag(this)">10099</span>
+                                <span class="tag" onclick="toggleTag(this)">IEPL</span>
+                                <span class="tag" onclick="toggleTag(this)">IPLC</span>
+                            </div>
+                        </div>
+
+                        <div id="carriersMode" class="carrier-routes mt-2" style="display:none;">
+                            <div class="carrier-group">
+                                <label class="carrier-label">电信:</label>
+                                <div class="route-direction">
+                                    <span class="direction-label">去程:</span>
+                                    <select id="telecomRoute1" class="form-control">
+                                        <option value="">留空</option>
+                                        <option value="163">163</option>
+                                        <option value="CN2">CN2</option>
+                                        <option value="CN2GIA">CN2GIA</option>
+                                        <option value="CMI">CMI</option>
+                                        <option value="CMIN2">CMIN2</option>
+                                        <option value="4837">4837</option>
+                                        <option value="10099">10099</option>
+                                        <option value="IEPL">IEPL</option>
+                                        <option value="IPLC">IPLC</option>
+                                    </select>
+                                </div>
+                                <div class="route-direction">
+                                    <span class="direction-label">回程:</span>
+                                    <select id="telecomRoute2" class="form-control">
+                                        <option value="">留空</option>
+                                        <option value="163">163</option>
+                                        <option value="CN2">CN2</option>
+                                        <option value="CN2GIA">CN2GIA</option>
+                                        <option value="CMI">CMI</option>
+                                        <option value="CMIN2">CMIN2</option>
+                                        <option value="4837">4837</option>
+                                        <option value="10099">10099</option>
+                                        <option value="IEPL">IEPL</option>
+                                        <option value="IPLC">IPLC</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="carrier-group">
+                                <label class="carrier-label">移动:</label>
+                                <div class="route-direction">
+                                    <span class="direction-label">去程:</span>
+                                    <select id="mobileRoute1" class="form-control">
+                                        <option value="">留空</option>
+                                        <option value="163">163</option>
+                                        <option value="CN2">CN2</option>
+                                        <option value="CN2GIA">CN2GIA</option>
+                                        <option value="CMI">CMI</option>
+                                        <option value="CMIN2">CMIN2</option>
+                                        <option value="4837">4837</option>
+                                        <option value="10099">10099</option>
+                                        <option value="IEPL">IEPL</option>
+                                        <option value="IPLC">IPLC</option>
+                                    </select>
+                                </div>
+                                <div class="route-direction">
+                                    <span class="direction-label">回程:</span>
+                                    <select id="mobileRoute2" class="form-control">
+                                        <option value="">留空</option>
+                                        <option value="163">163</option>
+                                        <option value="CN2">CN2</option>
+                                        <option value="CN2GIA">CN2GIA</option>
+                                        <option value="CMI">CMI</option>
+                                        <option value="CMIN2">CMIN2</option>
+                                        <option value="4837">4837</option>
+                                        <option value="10099">10099</option>
+                                        <option value="IEPL">IEPL</option>
+                                        <option value="IPLC">IPLC</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="carrier-group">
+                                <label class="carrier-label">联通:</label>
+                                <div class="route-direction">
+                                    <span class="direction-label">去程:</span>
+                                    <select id="unicomRoute1" class="form-control">
+                                        <option value="">留空</option>
+                                        <option value="163">163</option>
+                                        <option value="CN2">CN2</option>
+                                        <option value="CN2GIA">CN2GIA</option>
+                                        <option value="CMI">CMI</option>
+                                        <option value="CMIN2">CMIN2</option>
+                                        <option value="4837">4837</option>
+                                        <option value="10099">10099</option>
+                                        <option value="IEPL">IEPL</option>
+                                        <option value="IPLC">IPLC</option>
+                                    </select>
+                                </div>
+                                <div class="route-direction">
+                                    <span class="direction-label">回程:</span>
+                                    <select id="unicomRoute2" class="form-control">
+                                        <option value="">留空</option>
+                                        <option value="163">163</option>
+                                        <option value="CN2">CN2</option>
+                                        <option value="CN2GIA">CN2GIA</option>
+                                        <option value="CMI">CMI</option>
+                                        <option value="CMIN2">CMIN2</option>
+                                        <option value="4837">4837</option>
+                                        <option value="10099">10099</option>
+                                        <option value="IEPL">IEPL</option>
+                                        <option value="IPLC">IPLC</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="extra">额外备注 <small>(extra)</small></label>
+                        <input type="text" id="extra" class="form-control" placeholder="可添加其他备注信息">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>账单信息</span>
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label">账单金额及货币单位 <small>(amount)</small></label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="freeamount" onchange="toggleAmount()">
+                            <label for="freeamount" class="checkbox-label">免费</label>
+                        </div>
+                        <div class="input-group mt-2" id="amountInputGroup">
+                            <input type="number" id="amountValue" class="form-control" placeholder="金额">
+                            <select id="amountCurrency" class="form-control" onchange="toggleCustomAmount()">
+                                <option value="元">元</option>
+                                <option value="CNY">CNY</option>
+                                <option value="刀">刀</option>
+                                <option value="USD">USD</option>
+                                <option value="欧">欧</option>
+                                <option value="EUR">EUR</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <input type="text" id="amountCustom" class="form-control mt-2" placeholder="自定义货币单位" style="display:none;">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>流量配置</span>
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label" for="trafficType">流量类型 <small>(trafficType)</small></label>
+                        <select id="trafficType" class="form-control">
+                            <option value="1">单向 (1)</option>
+                            <option value="2">双向 (2)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">服务器带宽信息 <small>(bandwidth)</small></label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="unlimitedBandwidth" onchange="toggleBandwidth()">
+                            <label for="unlimitedBandwidth" class="checkbox-label">无限</label>
+                        </div>
+                        <div class="input-group mt-2" id="bandwidthInputGroup">
+                            <input type="number" id="bandwidthValue" class="form-control" placeholder="带宽">
+                            <select id="bandwidthUnit" class="form-control" onchange="toggleCustomBandwidth()">
+                                <option value="Gbps">Gbps</option>
+                                <option value="Mbps">Mbps</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <input type="text" id="bandwidthCustom" class="form-control mt-2" placeholder="自定义带宽单位" style="display:none;">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">流量配额及周期 <small>(trafficVol)</small></label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="unlimitedTraffic" onchange="toggleTraffic()">
+                            <label for="unlimitedTraffic" class="checkbox-label">无限</label>
+                        </div>
+                        <div class="input-group mt-2" id="trafficInputGroup">
+                            <input type="number" id="trafficValue" class="form-control" placeholder="流量">
+                            <select id="trafficUnit" class="form-control" onchange="toggleCustomTraffic()">
+                                <option value="TB">TB</option>
+                                <option value="GB">GB</option>
+                                <option value="MB">MB</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                            <select id="trafficPeriod" class="form-control" onchange="toggleCustomTraffic()">
+                                <option value="/月">/月</option>
+                                <option value="/M">/M</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <div class="input-group mt-2" style="display:none;" id="trafficCustomGroup">
+                            <input type="text" id="trafficUnitCustom" class="form-control" placeholder="自定义流量单位">
+                            <input type="text" id="trafficPeriodCustom" class="form-control" placeholder="自定义周期">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <button class="btn btn-primary" onclick="generatePublicNoteJSON()">
+                    <i class="fas fa-code"></i> 生成 JSON 代码
+                </button>
+            </div>
+
+            <div class="form-section">
+                <div class="code-container">
+                    <div class="code-toolbar">
+                        <button class="btn btn-outline btn-sm" onclick="copyToClipboard('jsonOutput')">
+                            <i class="fas fa-copy"></i> 复制
+                        </button>
+                    </div>
+                    <pre id="jsonOutput"><code class="language-json"></code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 流量监控代码 -->
+        <div class="tab-content" id="trafficMonitorTab">
+            <div class="form-grid">
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        <span>流量监控配置</span>
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label" for="monitorType">监控类型 <small>(type)</small></label>
+                        <select id="monitorType" class="form-control">
+                            <option value="transfer_in_cycle">仅入站流量</option>
+                            <option value="transfer_out_cycle">仅出站流量</option>
+                            <option value="transfer_all_cycle">双向流量总和</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="maxTraffic">最大流量限制 <small>(max)</small></label>
+                        <div class="input-group">
+                            <input type="number" id="maxTraffic" class="form-control" placeholder="流量数值">
+                            <select id="maxTrafficUnit" class="form-control">
+                                <option value="TB">TB</option>
+                                <option value="GB">GB</option>
+                                <option value="MB">MB</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="cycleStart">统计周期开始日期 <small>(cycle_start)</small></label>
+                        <input type="datetime-local" id="cycleStart" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="cycleInterval">统计周期数量 <small>(cycle_interval)</small></label>
+                        <input type="number" id="cycleInterval" class="form-control" min="1" value="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="cycleUnit">统计周期单位 <small>(cycle_unit)</small></label>
+                        <select id="cycleUnit" class="form-control">
+                            <option value="hour">小时 (hour)</option>
+                            <option value="day">天 (day)</option>
+                            <option value="week">周 (week)</option>
+                            <option value="month">月 (month)</option>
+                            <option value="year">年 (year)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="display:none;">
+                        <label class="form-label" for="cover">是否覆盖 <small>(cover)</small></label>
+                        <select id="cover" class="form-control">
+                            <option value="1">是 (1)</option>
+                            <option value="0">否 (0)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="ignore">监控的服务器ID <small>(ignore)</small></label>
+                        <input type="text" id="ignore" class="form-control" placeholder="输入服务器ID，用逗号分隔，如：3,4">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <button class="btn btn-primary" onclick="generateTrafficMonitorJSON()">
+                        <i class="fas fa-code"></i> 生成 JSON 代码
+                    </button>
+                </div>
+
+                <div class="
